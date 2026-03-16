@@ -840,14 +840,24 @@ sealed interface AppPreference<Pref, T> {
 
         val MpvGpuNext =
             AppSwitchPreference<AppPreferences>(
-                title = R.string.mpv_use_gpu_next,
-                defaultValue = false,
+                title = R.string.mpv_hdr_dolby_vision,
+                defaultValue = true,
                 getter = { it.playbackPreferences.mpvOptions.useGpuNext },
                 setter = { prefs, value ->
                     prefs.updateMpvOptions { useGpuNext = value }
                 },
-                summaryOn = R.string.enabled,
-                summaryOff = R.string.disabled,
+                summary = R.string.mpv_hdr_dolby_vision_summary,
+            )
+
+        val MpvAudioPassthrough =
+            AppSwitchPreference<AppPreferences>(
+                title = R.string.mpv_audio_passthrough,
+                defaultValue = false,
+                getter = { it.playbackPreferences.mpvOptions.useAudioPassthrough },
+                setter = { prefs, value ->
+                    prefs.updateMpvOptions { useAudioPassthrough = value }
+                },
+                summary = R.string.mpv_audio_passthrough_summary,
             )
 
         val MpvConfFile =
@@ -1103,6 +1113,7 @@ private val MpvSettings =
     listOf(
         AppPreference.MpvHardwareDecoding,
         AppPreference.MpvGpuNext,
+        AppPreference.MpvAudioPassthrough,
         AppPreference.MpvConfFile,
     )
 

@@ -65,7 +65,10 @@ class PlayerFactory
                         val useGpuNext =
                             prefs?.mpvOptions?.useGpuNext
                                 ?: AppPreference.MpvGpuNext.defaultValue
-                        MpvPlayer(context, enableHardwareDecoding, useGpuNext)
+                        val useAudioPassthrough =
+                            prefs?.mpvOptions?.useAudioPassthrough
+                                ?: AppPreference.MpvAudioPassthrough.defaultValue
+                        MpvPlayer(context, enableHardwareDecoding, useGpuNext, useAudioPassthrough)
                             .apply {
                                 playWhenReady = true
                             }
@@ -118,7 +121,8 @@ class PlayerFactory
                     -> {
                         val enableHardwareDecoding = prefs.mpvOptions.enableHardwareDecoding
                         val useGpuNext = prefs.mpvOptions.useGpuNext
-                        MpvPlayer(context, enableHardwareDecoding, useGpuNext)
+                        val useAudioPassthrough = prefs.mpvOptions.useAudioPassthrough
+                        MpvPlayer(context, enableHardwareDecoding, useGpuNext, useAudioPassthrough)
                     }
 
                     PlayerBackend.EXO_PLAYER,

@@ -67,6 +67,7 @@ class MpvPlayer(
     private val context: Context,
     private val enableHardwareDecoding: Boolean,
     private val useGpuNext: Boolean,
+    private val useAudioPassthrough: Boolean = false,
 ) : BasePlayer(),
     MPVLib.EventObserver,
     TrackSelector.InvalidationListener,
@@ -124,6 +125,8 @@ class MpvPlayer(
         } else {
             MPVLib.setOptionString("hwdec", "no")
         }
+        if (useGpuNext) MPVLib.setOptionString("target-colorspace-hint", "yes")
+        if (useAudioPassthrough) MPVLib.setOptionString("audio-spdif", "ac3,eac3,dts,dts-hd,truehd")
         MPVLib.setOptionString("gpu-context", "android")
 
         MPVLib.setOptionString("opengl-es", "yes")
@@ -848,6 +851,8 @@ class MpvPlayer(
         if (enableHardwareDecoding) {
             MPVLib.setOptionString("vo", if (useGpuNext) "gpu-next" else "gpu")
         }
+        if (useGpuNext) MPVLib.setOptionString("target-colorspace-hint", "yes")
+        if (useAudioPassthrough) MPVLib.setOptionString("audio-spdif", "ac3,eac3,dts,dts-hd,truehd")
         Timber.d("Called loadfile")
     }
 

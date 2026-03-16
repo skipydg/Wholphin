@@ -74,6 +74,7 @@ class AppPreferencesSerializer
                                             enableHardwareDecoding =
                                                 AppPreference.MpvHardwareDecoding.defaultValue
                                             useGpuNext = AppPreference.MpvGpuNext.defaultValue
+                                            useAudioPassthrough = AppPreference.MpvAudioPassthrough.defaultValue
                                         }.build()
                             }.build()
                     homePagePreferences =
