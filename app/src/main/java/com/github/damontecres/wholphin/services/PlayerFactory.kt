@@ -13,10 +13,13 @@ import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.DefaultRenderersFactory
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.Renderer
+import androidx.media3.exoplayer.mediacodec.MediaCodecAdapter
 import androidx.media3.exoplayer.mediacodec.MediaCodecSelector
 import androidx.media3.exoplayer.video.MediaCodecVideoRenderer
 import androidx.media3.exoplayer.video.VideoRendererEventListener
+import java.util.concurrent.atomic.AtomicBoolean
 import com.github.damontecres.wholphin.preferences.AppPreference
+import com.github.damontecres.wholphin.services.compat.DvCompatVideoRenderer
 import com.github.damontecres.wholphin.preferences.AppPreferences
 import com.github.damontecres.wholphin.preferences.MediaExtensionStatus
 import com.github.damontecres.wholphin.preferences.PlaybackPreferences
@@ -79,7 +82,9 @@ class PlayerFactory
                     -> {
                         val extensions = prefs?.overrides?.mediaExtensionsEnabled
                         val decodeAv1 = prefs?.overrides?.decodeAv1 == true
-                        Timber.v("extensions=$extensions")
+                        val dvCompatEnabled = prefs?.overrides?.dvCompatRenderer
+                            ?: AppPreference.DvCompatRenderer.defaultValue
+                        Timber.v("extensions=$extensions dvCompatEnabled=$dvCompatEnabled")
                         val rendererMode =
                             when (extensions) {
                                 MediaExtensionStatus.MES_FALLBACK -> DefaultRenderersFactory.EXTENSION_RENDERER_MODE_ON
@@ -90,7 +95,7 @@ class PlayerFactory
                         ExoPlayer
                             .Builder(context)
                             .setRenderersFactory(
-                                WholphinRenderersFactory(context, decodeAv1)
+                                WholphinRenderersFactory(context, decodeAv1, dvCompatEnabled)
                                     .setEnableDecoderFallback(true)
                                     .setExtensionRendererMode(rendererMode),
                             ).build()
@@ -130,7 +135,8 @@ class PlayerFactory
                     -> {
                         val extensions = prefs.overrides.mediaExtensionsEnabled
                         val decodeAv1 = prefs.overrides.decodeAv1
-                        Timber.v("extensions=$extensions")
+                        val dvCompatEnabled = prefs.overrides.dvCompatRenderer
+                        Timber.v("extensions=$extensions dvCompatEnabled=$dvCompatEnabled")
                         val rendererMode =
                             when (extensions) {
                                 MediaExtensionStatus.MES_FALLBACK -> DefaultRenderersFactory.EXTENSION_RENDERER_MODE_ON
@@ -141,7 +147,7 @@ class PlayerFactory
                         ExoPlayer
                             .Builder(context)
                             .setRenderersFactory(
-                                WholphinRenderersFactory(context, decodeAv1)
+                                WholphinRenderersFactory(context, decodeAv1, dvCompatEnabled)
                                     .setEnableDecoderFallback(true)
                                     .setExtensionRendererMode(rendererMode),
                             ).build()
@@ -165,6 +171,7 @@ val Player.isReleased: Boolean
 class WholphinRenderersFactory(
     context: Context,
     private val av1Enabled: Boolean,
+    private val dvCompatEnabled: Boolean = true,
 ) : DefaultRenderersFactory(context) {
     override fun buildVideoRenderers(
         context: Context,
@@ -176,25 +183,39 @@ class WholphinRenderersFactory(
         allowedVideoJoiningTimeMs: Long,
         out: ArrayList<Renderer>,
     ) {
-        var videoRendererBuilder =
-            MediaCodecVideoRenderer
-                .Builder(context)
-                .setCodecAdapterFactory(codecAdapterFactory)
-                .setMediaCodecSelector(mediaCodecSelector)
-                .setAllowedJoiningTimeMs(allowedVideoJoiningTimeMs)
-                .setEnableDecoderFallback(enableDecoderFallback)
-                .setEventHandler(eventHandler)
-                .setEventListener(eventListener)
-                .setMaxDroppedFramesToNotify(MAX_DROPPED_VIDEO_FRAME_COUNT_TO_NOTIFY)
-                .experimentalSetParseAv1SampleDependencies(false)
-                .experimentalSetLateThresholdToDropDecoderInputUs(C.TIME_UNSET)
-        if (Build.VERSION.SDK_INT >= 34) {
-            videoRendererBuilder =
-                videoRendererBuilder.experimentalSetEnableMediaCodecBufferDecodeOnlyFlag(
-                    false,
+        if (dvCompatEnabled) {
+            out.add(
+                DvCompatVideoRenderer(
+                    context = context,
+                    codecAdapterFactory = MediaCodecAdapter.Factory.getDefault(context),
+                    mediaCodecSelector = mediaCodecSelector,
+                    allowedJoiningTimeMs = allowedVideoJoiningTimeMs,
+                    enableDecoderFallback = enableDecoderFallback,
+                    forceCompatMode = false,
+                    dvP7Hint = AtomicBoolean(false),
+                    eventHandler = eventHandler,
+                    eventListener = eventListener,
                 )
+            )
+        } else {
+            var videoRendererBuilder =
+                MediaCodecVideoRenderer
+                    .Builder(context)
+                    .setCodecAdapterFactory(codecAdapterFactory)
+                    .setMediaCodecSelector(mediaCodecSelector)
+                    .setAllowedJoiningTimeMs(allowedVideoJoiningTimeMs)
+                    .setEnableDecoderFallback(enableDecoderFallback)
+                    .setEventHandler(eventHandler)
+                    .setEventListener(eventListener)
+                    .setMaxDroppedFramesToNotify(MAX_DROPPED_VIDEO_FRAME_COUNT_TO_NOTIFY)
+                    .experimentalSetParseAv1SampleDependencies(false)
+                    .experimentalSetLateThresholdToDropDecoderInputUs(C.TIME_UNSET)
+            if (Build.VERSION.SDK_INT >= 34) {
+                videoRendererBuilder =
+                    videoRendererBuilder.experimentalSetEnableMediaCodecBufferDecodeOnlyFlag(false)
+            }
+            out.add(videoRendererBuilder.build())
         }
-        out.add(videoRendererBuilder.build())
 
         if (extensionRendererMode == EXTENSION_RENDERER_MODE_OFF) {
             return

@@ -122,10 +122,8 @@ class MpvPlayer(
         if (enableHardwareDecoding) {
             MPVLib.setOptionString("hwdec", "mediacodec,mediacodec-copy")
             MPVLib.setOptionString("vo", if (useGpuNext) "gpu-next" else "gpu")
-            if (useGpuNext) MPVLib.setOptionString("target-colorspace-hint", "yes")
         } else {
             MPVLib.setOptionString("hwdec", "no")
-            MPVLib.setOptionString("vo", "gpu")
         }
         if (useAudioPassthrough) MPVLib.setOptionString("audio-spdif", "ac3,eac3,dts,dts-hd,truehd")
         MPVLib.setOptionString("gpu-context", "android")
@@ -851,9 +849,6 @@ class MpvPlayer(
 
         if (enableHardwareDecoding) {
             MPVLib.setOptionString("vo", if (useGpuNext) "gpu-next" else "gpu")
-            if (useGpuNext) MPVLib.setOptionString("target-colorspace-hint", "yes")
-        } else {
-            MPVLib.setOptionString("vo", "gpu")
         }
         if (useAudioPassthrough) MPVLib.setOptionString("audio-spdif", "ac3,eac3,dts,dts-hd,truehd")
         Timber.d("Called loadfile")

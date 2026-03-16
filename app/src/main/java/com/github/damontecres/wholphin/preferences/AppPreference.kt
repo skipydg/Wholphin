@@ -476,6 +476,18 @@ sealed interface AppPreference<Pref, T> {
                 summaryOff = R.string.disabled,
             )
 
+        val DvCompatRenderer =
+            AppSwitchPreference<AppPreferences>(
+                title = R.string.exo_dv_compat_renderer,
+                defaultValue = true,
+                getter = { it.playbackPreferences.overrides.dvCompatRenderer },
+                setter = { prefs, value ->
+                    prefs.updatePlaybackOverrides { dvCompatRenderer = value }
+                },
+                summaryOn = R.string.exo_dv_compat_renderer_summary_on,
+                summaryOff = R.string.exo_dv_compat_renderer_summary_off,
+            )
+
         val RememberSelectedTab =
             AppSwitchPreference<AppPreferences>(
                 title = R.string.remember_selected_tab,
@@ -840,13 +852,14 @@ sealed interface AppPreference<Pref, T> {
 
         val MpvGpuNext =
             AppSwitchPreference<AppPreferences>(
-                title = R.string.mpv_hdr_dolby_vision,
+                title = R.string.mpv_use_gpu_next,
                 defaultValue = false,
                 getter = { it.playbackPreferences.mpvOptions.useGpuNext },
                 setter = { prefs, value ->
                     prefs.updateMpvOptions { useGpuNext = value }
                 },
-                summary = R.string.mpv_hdr_dolby_vision_summary,
+                summaryOn = R.string.enabled,
+                summaryOff = R.string.disabled,
             )
 
         val MpvAudioPassthrough =
@@ -1098,6 +1111,7 @@ private val ExoPlayerSettings =
         AppPreference.DirectPlayAss,
         AppPreference.DirectPlayPgs,
         AppPreference.DirectPlayDoviProfile7,
+        AppPreference.DvCompatRenderer,
         AppPreference.DecodeAv1,
     )
 
