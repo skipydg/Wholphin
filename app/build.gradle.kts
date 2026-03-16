@@ -43,7 +43,7 @@ android {
         minSdk = 23
         targetSdk = 36
         versionCode = gitTags.trim().lines().size
-        versionName = gitDescribe.trim().removePrefix("v").ifBlank { "0.0.0" }
+        versionName = gitDescribe.trim().removePrefix("v").replace("-dv-compat", "").ifBlank { "0.0.0" }
         testInstrumentationRunner = "com.github.damontecres.wholphin.test.WholphinTestRunner"
     }
 
