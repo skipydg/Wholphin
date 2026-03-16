@@ -378,7 +378,7 @@
     <string name="dolby_atmos">Dolby Atmos</string>
     <string name="mpv_use_gpu_next">MPV: Use gpu-next</string>
     <string name="mpv_hdr_dolby_vision">HDR &amp; Dolby Vision</string>
-    <string name="mpv_hdr_dolby_vision_summary">Enables proper HDR and Dolby Vision tone-mapping. Required for Dolby Vision playback.</string>
+    <string name="mpv_hdr_dolby_vision_summary">Enables HDR10 tone-mapping in MPV. May improve HDR picture quality on compatible devices. Does not support Dolby Vision — use ExoPlayer for DV content. May cause freezes on some devices.</string>
     <string name="mpv_audio_passthrough">Bitstream Audio Passthrough</string>
     <string name="mpv_audio_passthrough_summary">Pass AC3, EAC3, DTS, and TrueHD directly to your receiver. May not work on all devices or AVR configurations — if audio is missing, disable this.</string>
     <string name="mpv_conf">Edit mpv.conf</string>

@@ -120,7 +120,7 @@ class MpvPlayer(
         MPVLib.setOptionString("config-dir", context.filesDir.path)
 
         if (enableHardwareDecoding) {
-            MPVLib.setOptionString("hwdec", "mediacodec")
+            MPVLib.setOptionString("hwdec", "mediacodec,mediacodec-copy")
             MPVLib.setOptionString("vo", if (useGpuNext) "gpu-next" else "gpu")
             if (useGpuNext) MPVLib.setOptionString("target-colorspace-hint", "yes")
         } else {
